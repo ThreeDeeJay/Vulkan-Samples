@@ -19,7 +19,7 @@ jobs:
         build_type: [Debug, Release]
     env:
       PARALLEL: -j 2
-      Artifacts: build\windows\app\bin\${{matrix.build_type}}\AMD64
+      Artifacts: build\windows\app\bin\Debug\AMD64
     runs-on: "${{ matrix.platform }}-latest"
     steps:
       - uses: actions/checkout@v4
