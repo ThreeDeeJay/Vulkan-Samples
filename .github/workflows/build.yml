@@ -19,6 +19,7 @@ jobs:
         build_type: [Debug, Release]
     env:
       PARALLEL: -j 2
+      GH_TOKEN: ${{github.token}}
       Artifacts: build\windows\app\bin\Debug\AMD64
     runs-on: "${{ matrix.platform }}-latest"
     steps:
