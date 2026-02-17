@@ -63,7 +63,7 @@ jobs:
         build_type: [Release]
     env:
       PARALLEL: -j 2
-      Artifacts: build/Release
+      Artifacts: app\bin\Debug\AMD64
     runs-on: "${{ matrix.platform }}-latest"
     steps:
       - uses: actions/checkout@v4
@@ -91,25 +91,30 @@ jobs:
         run: cmake --build "build/${{ matrix.platform }}" --target vkb__components --config ${{ matrix.build_type }} ${{ env.PARALLEL }}
 
       - name: List files
+        if: ${{ matrix.platform == 'windows' }}
         run: ls -R
 
       - name: Compress artifacts
+        if: ${{ matrix.platform == 'windows' }}
         run: |
           mkdir Release
           7z a "Release/${{env.Title}}.zip" "${{github.workspace}}/${{env.Artifacts}}/*" -mx=9
           cp "Release/${{env.Title}}.zip" "Release/${{env.Title}}_r${{env.CommitCount}}@${{env.CommitHashShort}}.zip"
   
       - name: Purge tag - latest-${{env.Branch}}
+        if: ${{ matrix.platform == 'windows' }}
         run: |
           gh release delete latest-${{env.Branch}} --repo ${{github.repository}} --cleanup-tag --yes || true
   
       - name: Release - archive-${{env.Branch}}
+        if: ${{ matrix.platform == 'windows' }}
         run: |
           gh release create archive-${{env.Branch}} --repo ${{github.repository}} --target ${{env.FirstCommitHash}} --latest=false --prerelease --title "${{env.Title}} build archive" --notes "Latest build: https://github.com/${{github.repository}}/releases/latest
           Build log: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}" || true
           gh release upload archive-${{env.Branch}} --repo ${{github.repository}} --clobber "Release/${{env.Title}}_r${{env.CommitCount}}@${{env.CommitHashShort}}.zip"
   
       - name: Release - latest-${{env.Branch}}
+        if: ${{ matrix.platform == 'windows' }}
         run: |
           gh release create latest-${{env.Branch}} --repo ${{github.repository}} --target ${{env.CommitHash}} --generate-notes --latest=true --title "${{env.Title}} r${{env.CommitCount}}@${{env.CommitHashShort}}" --notes "Build archive: https://github.com/${{github.repository}}/releases/tag/archive
           Build log: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}"
