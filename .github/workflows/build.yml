@@ -19,11 +19,21 @@ jobs:
         build_type: [Debug, Release]
     env:
       PARALLEL: -j 2
+      Artifacts: app\bin\${{matrix.build_type}}\AMD64
     runs-on: "${{ matrix.platform }}-latest"
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: "recursive"
+
+      - name: Get current date, commit hash and count
+        run: |
+          echo "FirstCommitHash=$(git rev-list --max-parents=0 HEAD --first-parent)" >> $env:GITHUB_ENV
+          echo "CommitHash=$(git rev-parse HEAD)" >> $env:GITHUB_ENV
+          echo "CommitHashShort=$(git rev-parse --short=7 HEAD)" >> $env:GITHUB_ENV
+          echo "CommitCount=$(git rev-list --count HEAD)" >> $env:GITHUB_ENV
+          echo "CommitDate=$(git show -s --date=format:'%Y-%m-%d' --format=%cd)" >> $env:GITHUB_ENV
+          
       - if: ${{ matrix.platform == 'ubuntu' }}
         name: Install RandR headers
         run: |
@@ -55,41 +65,6 @@ jobs:
           cmake -B"build/${{ matrix.platform }}" -DVKB_BUILD_TESTS=ON -DVKB_BUILD_SAMPLES=ON -DGLFW_BUILD_WAYLAND=OFF
           cmake --build "build/${{ matrix.platform }}" --target vulkan_samples --config ${{ matrix.build_type }} ${{ env.PARALLEL }}
 
-  build_v2:
-    name: "Build v2 Components ${{ matrix.platform }} in ${{ matrix.build_type }}"
-    strategy:
-      matrix:
-        platform: [windows, ubuntu]
-        build_type: [Release]
-    env:
-      PARALLEL: -j 2
-      Artifacts: app\bin\Debug\AMD64
-    runs-on: "${{ matrix.platform }}-latest"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: "recursive"
-
-      - name: Get current date, commit hash and count
-        run: |
-          echo "FirstCommitHash=$(git rev-list --max-parents=0 HEAD --first-parent)" >> $env:GITHUB_ENV
-          echo "CommitHash=$(git rev-parse HEAD)" >> $env:GITHUB_ENV
-          echo "CommitHashShort=$(git rev-parse --short=7 HEAD)" >> $env:GITHUB_ENV
-          echo "CommitCount=$(git rev-list --count HEAD)" >> $env:GITHUB_ENV
-          echo "CommitDate=$(git show -s --date=format:'%Y-%m-%d' --format=%cd)" >> $env:GITHUB_ENV
-
-      - if: ${{ matrix.platform == 'ubuntu' }}
-        name: Install RandR headers
-        run: |
-          sudo apt-get update
-          sudo apt install xorg-dev libglu1-mesa-dev
-
-      - name: Configure
-        run: cmake -B"build/${{ matrix.platform }}" -DVKB_BUILD_TESTS=ON -DGLFW_BUILD_WAYLAND=OFF
-
-      - name: "Build Components ${{ matrix.platform }} in ${{ matrix.build_type }}"
-        run: cmake --build "build/${{ matrix.platform }}" --target vkb__components --config ${{ matrix.build_type }} ${{ env.PARALLEL }}
-
       - name: List files
         if: ${{ matrix.platform == 'windows' }}
         run: ls -R
@@ -119,6 +94,32 @@ jobs:
           gh release create latest-${{env.Branch}} --repo ${{github.repository}} --target ${{env.CommitHash}} --generate-notes --latest=true --title "${{env.Title}} r${{env.CommitCount}}@${{env.CommitHashShort}}" --notes "Build archive: https://github.com/${{github.repository}}/releases/tag/archive
           Build log: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}"
           gh release upload latest-${{env.Branch}} --repo ${{github.repository}} --clobber "Release/${{env.Title}}.zip"
+
+  build_v2:
+    name: "Build v2 Components ${{ matrix.platform }} in ${{ matrix.build_type }}"
+    strategy:
+      matrix:
+        platform: [windows, ubuntu]
+        build_type: [Release]
+    env:
+      PARALLEL: -j 2
+    runs-on: "${{ matrix.platform }}-latest"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - if: ${{ matrix.platform == 'ubuntu' }}
+        name: Install RandR headers
+        run: |
+          sudo apt-get update
+          sudo apt install xorg-dev libglu1-mesa-dev
+
+      - name: Configure
+        run: cmake -B"build/${{ matrix.platform }}" -DVKB_BUILD_TESTS=ON -DGLFW_BUILD_WAYLAND=OFF
+
+      - name: "Build Components ${{ matrix.platform }} in ${{ matrix.build_type }}"
+        run: cmake --build "build/${{ matrix.platform }}" --target vkb__components --config ${{ matrix.build_type }} ${{ env.PARALLEL }}
 
   build_macos:
     needs: build
