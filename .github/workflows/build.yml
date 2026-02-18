@@ -20,7 +20,7 @@ jobs:
     env:
       PARALLEL: -j 2
       GH_TOKEN: ${{github.token}}
-      Artifacts: build\windows\app\bin\Debug\AMD64\vulkan_samples.exe
+      Artifacts: build\windows\app\bin\${{matrix.build_type}}\AMD64\vulkan_samples.exe
       Branch: ${{github.ref_name}}
       Title: ${{github.event.repository.name}}
     runs-on: "${{ matrix.platform }}-latest"
@@ -66,7 +66,7 @@ jobs:
       - if: ${{ matrix.platform != 'windows' }}
         name: Configure and build
         run: |
-          cmake -B"build/${{ matrix.platform }}" -DVKB_BUILD_TESTS=ON -DVKB_BUILD_SAMPLES=ON -DGLFW_BUILD_WAYLAND=OFF
+          cmake -B"build/${{ matrix.platform }}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DVKB_BUILD_TESTS=ON -DVKB_BUILD_SAMPLES=ON -DGLFW_BUILD_WAYLAND=OFF 
           cmake --build "build/${{ matrix.platform }}" --target vulkan_samples --config ${{ matrix.build_type }} ${{ env.PARALLEL }}
 
       - name: List files
