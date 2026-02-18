@@ -379,7 +379,7 @@ void FullScreenExclusive::init_swapchain()
 	info.imageFormat      = format.format;
 	info.imageColorSpace  = format.colorSpace;
 	info.imageExtent      = swapchain_size;
-	info.imageArrayLayers = 1;
+	info.imageArrayLayers = 2;
 	info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	info.preTransform     = pre_transform;
