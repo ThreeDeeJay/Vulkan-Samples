@@ -20,7 +20,7 @@ jobs:
     env:
       PARALLEL: -j 2
       GH_TOKEN: ${{github.token}}
-      Artifacts: build\windows\app\bin\Debug\AMD64
+      Artifacts: build\windows\app\bin\Debug\AMD64\vulkan_samples.exe
       Branch: ${{github.ref_name}}
       Title: ${{github.event.repository.name}}
     runs-on: "${{ matrix.platform }}-latest"
