@@ -74,6 +74,7 @@ jobs:
         run: ls -R
 
       - name: Deploy
+        if: ${{ matrix.platform == 'windows' && matrix.build_type == 'Release' }}
         shell: cmd
         run: |
           If exist "assets" (xcopy "assets\" "${{env.Artifacts}}\assets\")
