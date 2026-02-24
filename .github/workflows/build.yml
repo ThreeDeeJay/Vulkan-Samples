@@ -73,6 +73,11 @@ jobs:
         if: ${{ matrix.platform == 'windows' && matrix.build_type == 'Release' }}
         run: ls -R
 
+      - name: Deploy
+        shell: cmd
+        run: |
+          If exist "assets" (xcopy "assets\" "${{env.Artifacts}}\assets\")
+
       - name: Compress artifacts
         if: ${{ matrix.platform == 'windows' && matrix.build_type == 'Release' }}
         run: |
