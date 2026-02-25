@@ -77,7 +77,8 @@ jobs:
         if: ${{ matrix.platform == 'windows' && matrix.build_type == 'Release' }}
         shell: cmd
         run: |
-          xcopy "assets\" "${{env.Artifacts}}\assets\" /s
+          xcopy "assets\scenes\" "${{env.Artifacts}}\assets\scenes\" /s
+          xcopy "shaders\" "${{env.Artifacts}}\shaders\"
 
       - name: Compress artifacts
         if: ${{ matrix.platform == 'windows' && matrix.build_type == 'Release' }}
