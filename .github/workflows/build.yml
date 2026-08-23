@@ -25,9 +25,14 @@ jobs:
       Title: ${{github.event.repository.name}}
     runs-on: "${{ matrix.platform }}-latest"
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: "recursive"
+      - name: Clone repo and submodules
+        run: >
+          git
+          clone https://${{github.repository_owner}}:${{github.token}}@github.com/${{github.repository}}.git
+          "${{github.workspace}}"
+          --revision ${env:GITHUB_SHA}
+          --filter=blob:none
+          --recurse-submodules
 
       - name: Get current date, commit hash and count
         if: ${{ matrix.platform == 'windows' && matrix.build_type == 'Release' }}
