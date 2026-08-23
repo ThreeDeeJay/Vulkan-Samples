@@ -79,7 +79,7 @@ jobs:
         run: |
           xcopy "assets\scenes\" "${{env.Artifacts}}\assets\scenes\" /s
           xcopy "assets\fonts\" "${{env.Artifacts}}\assets\fonts\" /s
-          xcopy "shaders\" "${{env.Artifacts}}\shaders\"
+          xcopy "shaders\" "${{env.Artifacts}}\shaders\" /s
 
       - name: Compress artifacts
         if: ${{ matrix.platform == 'windows' && matrix.build_type == 'Release' }}
