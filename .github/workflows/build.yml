@@ -28,9 +28,8 @@ jobs:
       - name: Clone repo and submodules
         run: >
           git
-          clone https://KhronosGroup/Vulkan-Samples.git
+          clone https://github.com/KhronosGroup/Vulkan-Samples.git
           "${{github.workspace}}"
-          --revision ${{github.sha}}
           --filter=blob:none
           --recurse-submodules
       - name: Get current date, commit hash and count
